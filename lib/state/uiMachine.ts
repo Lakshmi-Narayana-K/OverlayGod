@@ -73,6 +73,7 @@ const sendChat = ({ event }: { event: UIEvent }) => {
     if (event.type !== 'SUBMIT') return;
     const msg = event.value.trim();
   if (!msg) return;
+  console.log('[uiMachine.ts] sendChat action triggered with message:', msg);
   (window as any).api.send('chat:submit', msg);
 };
 

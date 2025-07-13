@@ -61,6 +61,7 @@ export const AI: React.FC<AIProps> = ({ isChatPaneVisible, onContentChange }) =>
     const handleStreamChunk = (chunk: { text?: string; reset?: boolean }) => {
       // 1. Handle the reset flag (start of a new turn)
       if (chunk.reset) {
+        console.log('[AI.tsx] handleStreamChunk: Reset signal received. Preparing for new turn.');
         resetIsPending.current = true;
         firstChunkBuffer.current = '';
         skipResponse.current = false;
@@ -69,7 +70,12 @@ export const AI: React.FC<AIProps> = ({ isChatPaneVisible, onContentChange }) =>
 
       }
 
-      if (!chunk.text) return;
+      if (!chunk.text) {
+        console.log('[AI.tsx] handleStreamChunk: Received empty text chunk. Skipping.');
+        return;
+      }
+
+      console.log('[AI.tsx] handleStreamChunk: Processing chunk:', chunk.text);
 
 
       // Helper to append text and update width heuristics
@@ -88,35 +94,39 @@ export const AI: React.FC<AIProps> = ({ isChatPaneVisible, onContentChange }) =>
 
       // 2. We're still awaiting the first meaningful chunk after reset
       if (resetIsPending.current) {
-
+        console.log('[AI.tsx] handleStreamChunk: Reset pending. Buffering first chunk:', chunk.text);
         firstChunkBuffer.current += chunk.text;
 
         // If we haven't received the end of the tag yet, keep buffering
         if (firstChunkBuffer.current.startsWith('<') && !firstChunkBuffer.current.includes('>')) {
-
+          console.log('[AI.tsx] handleStreamChunk: Buffering incomplete tag. Current buffer:', firstChunkBuffer.current);
           return;
         }
 
         const buf = firstChunkBuffer.current;
+        console.log('[AI.tsx] handleStreamChunk: First chunk buffer complete. Processing buffer:', buf);
 
         if (buf.startsWith('<NONE/>')) {
-          // Completely ignore this response
+          console.log('[AI.tsx] handleStreamChunk: Detected <NONE/> tag. Skipping response.');
           skipResponse.current = true;
           resetIsPending.current = false;
           return;
         }
 
         if (buf.startsWith('<APPEND/>')) {
-
+          console.log('[AI.tsx] handleStreamChunk: Detected <APPEND/> tag. Entering append mode.');
           appendMode.current = true;
           resetIsPending.current = false;
           const contentAfterTag = buf.replace('<APPEND/>', '');
-          if (contentAfterTag) addContent(contentAfterTag);
+          if (contentAfterTag) {
+            console.log('[AI.tsx] handleStreamChunk: Appending content after <APPEND/> tag:', contentAfterTag);
+            addContent(contentAfterTag);
+          }
           return;
         }
 
         // Any other content means a brand-new answer.
-
+        console.log('[AI.tsx] handleStreamChunk: No special tag detected. Starting new answer with:', buf);
         appendMode.current = false;
         skipResponse.current = false;
         resetIsPending.current = false;
@@ -143,6 +153,7 @@ export const AI: React.FC<AIProps> = ({ isChatPaneVisible, onContentChange }) =>
       submit: () => {
         const val = inputRef.current?.value.trim() || '';
         if (!isChatLoading && val) {
+          console.log('[AI.tsx] Sending SUBMIT event to UI actor with value:', val);
           send({ type: 'SUBMIT', value: val });
           setInputValue('');
         }
@@ -151,6 +162,7 @@ export const AI: React.FC<AIProps> = ({ isChatPaneVisible, onContentChange }) =>
 
     window.api.receive('api-stream-chunk', handleStreamChunk as any);
     window.api.receive('gemini-transcript', handleStreamChunk as any);
+    window.api.receive('chat:chunk', handleStreamChunk as any);
     window.api.receive('api-error', handleApiError);
     window.api.receive('set-initial-input', handleSetInitialInput);
 
@@ -158,6 +170,7 @@ export const AI: React.FC<AIProps> = ({ isChatPaneVisible, onContentChange }) =>
       window.api.removeAllListeners('api-stream-chunk');
       delete (window as any).chatInputAPI;
       window.api.removeAllListeners('gemini-transcript');
+      window.api.removeAllListeners('chat:chunk');
       window.api.removeAllListeners('api-error');
       window.api.removeAllListeners('set-initial-input');
     };
@@ -168,6 +181,13 @@ export const AI: React.FC<AIProps> = ({ isChatPaneVisible, onContentChange }) =>
       inputRef.current?.focus();
     }
   }, [isChatPaneVisible, isChatIdle, isChatError]);
+
+  // Reset content width when mic/live mode is turned off
+  useEffect(() => {
+    if (!isLiveActive) {
+      onContentChange?.(false);
+    }
+  }, [isLiveActive, onContentChange]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -223,7 +243,7 @@ export const AI: React.FC<AIProps> = ({ isChatPaneVisible, onContentChange }) =>
       )}
 
       {/* Right Panel - Chat (Flexible Width) */}
-      <div className="flex-1 flex flex-col h-full gap-2 min-w-0 text-sm">
+      <div className={`flex-1 flex flex-col h-full gap-2 min-w-0 text-sm ${isLiveActive ? '' : 'h-1/4'}`}>
         {/* Chat Content - Expands to fill available space */}
         {renderChatContent()}
         

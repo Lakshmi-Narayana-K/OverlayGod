@@ -65,7 +65,7 @@ export function registerIpcHandlers(ctx: IpcContext): void {
   let apiRequestController: AbortController | null = null;
 
   ipcMain.on('chat:submit', async (_evt, input: string) => {
-    console.warn('chat:submit received', input);
+    console.warn('[router.ts] chat:submit received in main process with input:', input);
     setCurrentInputValue(input);
     apiRequestController = new AbortController();
     try {
@@ -98,7 +98,7 @@ export function registerIpcHandlers(ctx: IpcContext): void {
             broadcast('api-success');
             isFirstChunk = false;
           }
-          broadcast('chat:chunk', chunk);
+          broadcast('chat:chunk', { text: chunk });
         },
         apiRequestController.signal,
         screenshotBase64

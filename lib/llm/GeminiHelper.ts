@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI, ChatSession, GenerativeModel, FunctionCallingMode } from '@google/generative-ai'
 
-import { GEMINI_SYSTEM_PROMPT } from './systemPrompt'
+import { CLUELY_SYSTEM_PROMPT } from './systemPrompt'
 
 const GEMINI_API_KEY =
   process.env.GEMINI_API_KEY || (import.meta as any).env?.VITE_GEMINI_API_KEY
@@ -25,6 +25,7 @@ export class GeminiHelper {
   public startNewChat() {
     this.chat = this.model.startChat({
       history: [],
+      systemInstruction: { role: 'model', parts: [{ text: CLUELY_SYSTEM_PROMPT }] },
       toolConfig: {
         functionCallingConfig: {
           mode: FunctionCallingMode.NONE
@@ -73,6 +74,7 @@ export class GeminiHelper {
         // The SDK doesn't have a stream.cancel(), so we just break the loop.
         break
       }
+      console.log("[GeminiHelper] chunk.text()", chunk.text())
       onChunk(chunk.text())
     }
   }
