@@ -15,7 +15,8 @@ export function createAppWindow(isInvisible = false, t0: number): BrowserWindow 
     skipTaskbar: true, // show in taskbar during dev
     webPreferences: {
       preload: join(__dirname, '../preload/preload.js'),
-      sandbox: false
+      sandbox: false,
+      devTools: true // Ensure dev tools are enabled
     },
     show: true,
     alwaysOnTop: true, // avoid hiding behind others in dev
@@ -83,5 +84,12 @@ export function createAppWindow(isInvisible = false, t0: number): BrowserWindow 
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+
+  // Add global shortcut for dev tools
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    if (input.key === 'F12' || (input.control && input.shift && input.key.toLowerCase() === 'i')) {
+      mainWindow.webContents.toggleDevTools();
+    }
+  });
   return mainWindow
 }
