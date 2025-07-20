@@ -11,15 +11,18 @@ export class TranscribeHelper {
   private apiKey: string;
 
   constructor() {
-    this.apiKey = process.env.DEEPGRAM_API_KEY || (import.meta as any).env?.VITE_DEEPGRAM_API_KEY;
+    this.apiKey = 'ae5c5c28f34dd29b8fbcdc2b1a2e6c4b3c7dcc3b'
     if (!this.apiKey) {
       console.error('Deepgram API Key not found. Please set DEEPGRAM_API_KEY in your .env file.');
+      // Don't create the client if API key is missing
+      this.deepgram = null as any;
+    } else {
+      this.deepgram = createClient(this.apiKey);
     }
-    this.deepgram = createClient(this.apiKey);
   }
 
   public async start(onTranscript: (res: { transcript: string; channel: number; isFinal: boolean; words?: any[] }) => void, onUtteranceEnd?: () => void): Promise<void> {
-    if (!this.apiKey) {
+    if (!this.apiKey || !this.deepgram) {
       console.error('Cannot start Deepgram transcription: API Key is missing.');
       return Promise.reject(new Error('Deepgram API Key is missing.'));
     }
@@ -95,6 +98,10 @@ export class TranscribeHelper {
   }
 
   public sendChunk(chunk: Buffer): void {
+    if (!this.deepgram) {
+      console.warn('Deepgram client not initialized. Cannot send audio chunk.');
+      return;
+    }
     if (this.connection && this.connection.getReadyState() === 1) { // WebSocket.OPEN
       this.connection.send(chunk);
     } else {
@@ -103,6 +110,10 @@ export class TranscribeHelper {
   }
 
   public finish(): void {
+    if (!this.deepgram) {
+      console.warn('Deepgram client not initialized. Cannot finish connection.');
+      return;
+    }
     if (this.connection) {
       console.warn('Closing Deepgram connection.');
       this.connection.finish();

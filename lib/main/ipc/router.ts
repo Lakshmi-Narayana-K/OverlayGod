@@ -5,12 +5,12 @@ import { appState } from '@/lib/state/AppStateMachine'
 import { LiveAudioService } from '@/lib/features/live-audio/LiveAudioService'
 import { ShortcutsHelper } from '@/lib/main/shortcuts'
 import { windowRegistry } from '@/lib/main/windowRegistry'
-import { GroqHelper } from '@/lib/llm/GroqHelper'
+// import { GroqHelper } from '@/lib/llm/GroqHelper'
 
 interface IpcContext {
   liveAudioService: LiveAudioService
   shortcutsHelper: ShortcutsHelper,
-  groqHelper: GroqHelper,
+  // groqHelper: GroqHelper,
   createAppWindow: (invisible: boolean) => BrowserWindow
   // window tracking
   getMainWindow: () => BrowserWindow | null
@@ -27,7 +27,7 @@ export function registerIpcHandlers(ctx: IpcContext): void {
   const {
     liveAudioService,
     shortcutsHelper,
-    groqHelper,
+    // groqHelper,
     createAppWindow,
     getMainWindow,
     setMainWindow,
@@ -52,10 +52,10 @@ export function registerIpcHandlers(ctx: IpcContext): void {
     setCurrentInputValue(value)
   })
 
-  ipcMain.handle('streamGroqQuestions', async (_event, prevQuestions: string[], currentTranscript: string) => {
-    const result = await groqHelper.streamQuestions(prevQuestions, currentTranscript, () => {});
-    return result.actions;
-  });
+  // ipcMain.handle('streamGroqQuestions', async (_event, prevQuestions: string[], currentTranscript: string) => {
+  //   const result = await groqHelper.streamQuestions(prevQuestions, currentTranscript, () => {});
+  //   return result.actions;
+  // });
 
   ipcMain.on('input-changed', (_evt, value: string) => {
     setCurrentInputValue(value);

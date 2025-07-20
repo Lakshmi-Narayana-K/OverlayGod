@@ -169,11 +169,11 @@ export const Mainbar = () => {
         </div>
 
         {/* Right - Invisibility Toggle */}
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" onClick={handleInvisibilityToggle} title={isInvisible ? 'Enable invisibility' : 'Disable invisibility'}>
             {isInvisible ? <Eye /> : <EyeOff />}
           </Button>
-        </div>
+        </div> */}
 
         {/* Right - Quit button */}
         <div className="flex items-center gap-2">

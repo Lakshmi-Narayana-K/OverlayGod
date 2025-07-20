@@ -5,13 +5,13 @@ import { GEMINI_SYSTEM_PROMPT } from './systemPrompt'
 const GEMINI_API_KEY =
   process.env.GEMINI_API_KEY || (import.meta as any).env?.VITE_GEMINI_API_KEY
 
-if (!GEMINI_API_KEY) {
-  throw new Error(
-    'GEMINI_API_KEY is not set. Ensure it exists in .env or as a system env variable, or that it is defined in Vite env files.'
-  )
-}
+let genAI: GoogleGenAI | null = null;
 
-const genAI = new GoogleGenAI({ apiKey: GEMINI_API_KEY })
+if (GEMINI_API_KEY) {
+  genAI = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+} else {
+  console.error('GEMINI_API_KEY is not set. Ensure it exists in .env or as a system env variable, or that it is defined in Vite env files.');
+}
 
 interface LiveSession {
   sendRealtimeInput: (input: any) => void
@@ -30,6 +30,11 @@ export class GeminiLiveHelper {
   // Ensure `turnJustCompleted` is true so that the very first chunk we receive in a fresh session
   // is treated as the start of a new turn (UI reset).
   async startSession(onMessage: (chunk: ChatChunk) => void): Promise<void> {
+    if (!genAI) {
+      console.error('Cannot start Gemini Live session: API Key is missing.');
+      return Promise.reject(new Error('Gemini API Key is missing.'));
+    }
+    
     // Treat the upcoming first chunk as a new turn so downstream consumers get a reset flag.
     this.turnJustCompleted = true;
     if (this.session) {
