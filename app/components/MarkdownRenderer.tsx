@@ -1,51 +1,72 @@
-import React, { memo, useState } from 'react';
-import { Clipboard } from 'lucide-react';
-import Markdown from 'react-markdown';
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
-import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
-import materialOceanic from 'react-syntax-highlighter/dist/cjs/styles/prism/material-oceanic';
-import tsx from 'react-syntax-highlighter/dist/cjs/languages/prism/tsx';
-import typescript from 'react-syntax-highlighter/dist/cjs/languages/prism/typescript';
-import javascript from 'react-syntax-highlighter/dist/cjs/languages/prism/javascript';
-import markdown from 'react-syntax-highlighter/dist/cjs/languages/prism/markdown';
-import json from 'react-syntax-highlighter/dist/cjs/languages/prism/json';
-import css from 'react-syntax-highlighter/dist/cjs/languages/prism/css';
-
-SyntaxHighlighter.registerLanguage('tsx', tsx);
-SyntaxHighlighter.registerLanguage('typescript', typescript);
-SyntaxHighlighter.registerLanguage('javascript', javascript);
-SyntaxHighlighter.registerLanguage('markdown', markdown);
-SyntaxHighlighter.registerLanguage('json', json);
-SyntaxHighlighter.registerLanguage('css', css);
-import 'katex/dist/katex.min.css'; // KaTeX CSS
-
-interface MarkdownRendererProps {
-  content: string;
-}
+import React, { memo, useState, useEffect } from 'react'
+import { Clipboard } from 'lucide-react'
+import Markdown from 'react-markdown'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
+import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter'
+// Use ESM imports and a working theme
+import { materialOceanic } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import 'katex/dist/katex.min.css'
 
 const CodeBlock: React.FC<{
-  node?: object;
-  inline?: boolean;
-  className?: string;
-  children?: React.ReactNode;
+  node?: object
+  inline?: boolean
+  className?: string
+  children?: React.ReactNode
 }> = ({ node: _node, inline, className, children, ...props }) => {
-  const [hasMounted, setHasMounted] = React.useState(false);
-  const [copied, setCopied] = useState(false);
+  const [hasMounted, setHasMounted] = React.useState(false)
+  const [copied, setCopied] = useState(false)
+  const [languagesLoaded, setLanguagesLoaded] = useState(false)
+
 
   React.useEffect(() => {
-    setHasMounted(true);
-  }, []);
+    setHasMounted(true)
 
-  if (!hasMounted) return null;
+    // Dynamic language loading
+    const loadLanguages = async () => {
+      try {
+        const [tsx, typescript, javascript, markdown, json, css, python, java] = await Promise.all([
+          import('react-syntax-highlighter/dist/esm/languages/prism/tsx'),
+          import('react-syntax-highlighter/dist/esm/languages/prism/typescript'),
+          import('react-syntax-highlighter/dist/esm/languages/prism/javascript'),
+          import('react-syntax-highlighter/dist/esm/languages/prism/markdown'),
+          import('react-syntax-highlighter/dist/esm/languages/prism/json'),
+          import('react-syntax-highlighter/dist/esm/languages/prism/css'),
+          import('react-syntax-highlighter/dist/esm/languages/prism/python'),
+          import('react-syntax-highlighter/dist/esm/languages/prism/java'),
+        ])
+
+        SyntaxHighlighter.registerLanguage('tsx', tsx.default)
+        SyntaxHighlighter.registerLanguage('typescript', typescript.default)
+        SyntaxHighlighter.registerLanguage('javascript', javascript.default)
+        SyntaxHighlighter.registerLanguage('js', javascript.default)
+        SyntaxHighlighter.registerLanguage('markdown', markdown.default)
+        SyntaxHighlighter.registerLanguage('json', json.default)
+        SyntaxHighlighter.registerLanguage('css', css.default)
+        SyntaxHighlighter.registerLanguage('python', python.default)
+        SyntaxHighlighter.registerLanguage('java', java.default)
+
+        setLanguagesLoaded(true)
+      } catch (error) {
+        console.error('Failed to load syntax highlighting languages:', error)
+        setLanguagesLoaded(true) // Still allow rendering
+      }
+    }
+
+    loadLanguages()
+  }, [])
+
+  if (!hasMounted) return null
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(String(children).replace(/\n$/, ''));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+    navigator.clipboard.writeText(String(children).replace(/\n$/, ''))
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
-  const match = /language-(\w+)/.exec(className || '');
+  const match = /language-(\w+)/.exec(className || '')
+  console.log(languagesLoaded, match?.[1], 'languagesLoaded')
+
   return !inline && match ? (
     <div className="relative rounded-md overflow-hidden my-4 shadow-md">
       <div className="flex justify-between items-center bg-gray-800 px-4 py-2 text-gray-400 text-xs font-mono rounded-t-md">
@@ -61,7 +82,7 @@ const CodeBlock: React.FC<{
       <div className="overflow-auto custom-scrollbar">
         <SyntaxHighlighter
           style={materialOceanic}
-          language={match[1]}
+          language={languagesLoaded ? match[1] : 'text'}
           PreTag="div"
           customStyle={{
             margin: 0,
@@ -79,12 +100,18 @@ const CodeBlock: React.FC<{
     <code className={className} {...props}>
       {children}
     </code>
-  );
-};
+  )
+}
+
+// Remove the custom codeTheme object completely
+
+interface MarkdownRendererProps {
+  content: string
+}
 
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
   if (!content) {
-    return null; // Return null for empty content
+    return null // Return null for empty content
   }
 
   return (
@@ -99,8 +126,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
         {content}
       </Markdown>
     </div>
-  );
-};
+  )
+}
 
-
-export default memo(MarkdownRenderer);
+export default memo(MarkdownRenderer)
