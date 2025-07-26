@@ -21,6 +21,7 @@ export interface UIContext {
 export type UIEvent =
   | { type: 'OPEN_CHAT' }
   | { type: 'SUBMIT'; value: string }
+  | { type: 'SCREEN_ANALYSIS' }
   | { type: 'ESC' }
   | { type: 'MIC_START' }
   | { type: 'MIC_STOP' }
@@ -77,6 +78,11 @@ const sendChat = ({ event }: { event: UIEvent }) => {
   (window as any).api.send('chat:submit', msg);
 };
 
+const sendScreenAnalysis = () => {
+  console.log('[uiMachine.ts] sendScreenAnalysis action triggered');
+  (window as any).api.send('screen:analyze');
+};
+
 const cancelChat = () => {
   (window as any).api.send('chat:cancel');
 }
@@ -119,7 +125,12 @@ export const uiMachine = createMachine<UIContext, UIEvent>(
             on: {
               SUBMIT: {
                 target: 'loading',
-                guard: 'hasInput'
+                guard: 'hasInput',
+                actions: ['sendChat']
+              },
+              SCREEN_ANALYSIS: {
+                target: 'loading',
+                actions: ['sendScreenAnalysis']
               },
               MIC_START: {
                 target: '#ui.live.loading',
@@ -132,7 +143,7 @@ export const uiMachine = createMachine<UIContext, UIEvent>(
             }
           },
           loading: {
-            entry: [clearError, 'sendChat'],
+            entry: [clearError],
             on: {
               API_SUCCESS: {
                 target: 'idle'
@@ -150,6 +161,10 @@ export const uiMachine = createMachine<UIContext, UIEvent>(
           error: {
             on: {
               SUBMIT: {
+                target: 'loading',
+                actions: [clearError]
+              },
+              SCREEN_ANALYSIS: {
                 target: 'loading',
                 actions: [clearError]
               },
@@ -229,6 +244,7 @@ export const uiMachine = createMachine<UIContext, UIEvent>(
       startLiveService,
       stopLiveService,
       sendChat,
+      sendScreenAnalysis,
       cancelChat
     },
     services: {

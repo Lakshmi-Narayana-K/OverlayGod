@@ -46,3 +46,15 @@ body,
   margin: 0;
   /* line-height: 1.4; */
 }
+
+/* Prevent scroll events from bubbling up from chat areas */
+[data-chat-container] {
+  /* Ensure scrolling stays within this container */
+  overscroll-behavior: contain;
+}
+
+/* Alternative: Use CSS to isolate scroll behavior */
+.chat-scroll-container {
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+}
