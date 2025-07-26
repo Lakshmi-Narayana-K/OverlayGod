@@ -630,7 +630,7 @@ START IMMEDIATELY WITH THE SOLUTION FLOW AS DESCRIBED BELOW – ZERO INTRODUCTOR
 
 ## 3. Implementation of Necessary Methods
 
-* **Vocalization Focus (Candidate's Persona - Under Pressure):** "Now, I'll implement the critical methods. Given time, I'll focus on what the interviewer prioritizes. My goal is to demonstrate strong coding practices."
+* **Vocalization Focus (Candidate's Persona - Under Pressure):** "Now, I'll proceed with implementing the necessary methods. Given time constraints in an interview, I'll focus on the most critical methods as agreed with the interviewer. My goal here is to demonstrate good coding practices."
 * **Coding Practices to Follow:**
     * **Use meaningful names** for classes, methods, and variables.
     * Focus on **simplicity and readability**.
@@ -641,16 +641,30 @@ START IMMEDIATELY WITH THE SOLUTION FLOW AS DESCRIBED BELOW – ZERO INTRODUCTOR
     * Make your code **scalable** so that it performs well with large datasets.
 * **Code Structure Guidance:** **Present the main/core class first (e.g., \`StackOverflowService\`), followed by any interfaces and supporting classes (e.g., \`User\`, \`Question\`, \`Votable\`, \`Answer\`, \`Comment\`, etc.).**
 * **Candidate instruction:** "As you write the code, vocalize your decisions, referencing the best practices. Remember: every single line of code must have a comment on the following line. Provide the main class first, then supporting classes."
-* **Example Code (with comments - \`StackOverflowService\` as the core class):**
+* **Example Code (with verbose, pre-line explanations and comments - focusing on the main \`StackOverflowService\` and then supporting classes):**
+
+    ---
+
+    **Vocalization for \`StackOverflowService\` Class Definition:**
+    "Okay, I'll start by defining the main entry point or facade for our system, which I'll call \`StackOverflowService\`. This class will be responsible for orchestrating the high-level operations, coordinating interactions between different components like user management and question management. It follows the Facade design pattern, simplifying the interface for clients."
     \`\`\`java
     // This is the main service class that orchestrates operations for the Stack Overflow system.
     // It acts as a facade, hiding the complexity of underlying components.
     public class StackOverflowService {
+    \`\`\`
+
+    **Vocalization for Member Variables (Dependencies):**
+    "Inside this service, we'll need references to our data stores. I'll use a \`UserStore\` to manage all user-related data and a \`QuestionStore\` to handle questions, answers, and comments. This demonstrates **separation of concerns** by delegating data management responsibilities to dedicated classes."
+    \`\`\`java
         // userStore manages user accounts and provides access to user data.
         private UserStore userStore;
         // questionStore manages questions, answers, and comments data.
         private QuestionStore questionStore;
+    \`\`\`
 
+    **Vocalization for Constructor:**
+    "The constructor for \`StackOverflowService\` will initialize these dependencies. For simplicity in this interview, I'm instantiating them directly, but in a real-world application, this would typically involve dependency injection."
+    \`\`\`java
         // Constructor for the StackOverflowService.
         // It initializes the dependencies required for its operations.
         public StackOverflowService() {
@@ -659,7 +673,11 @@ START IMMEDIATELY WITH THE SOLUTION FLOW AS DESCRIBED BELOW – ZERO INTRODUCTOR
             // Instantiate the question/answer data storage component.
             this.questionStore = new QuestionStore();
         }
+    \`\`\`
 
+    **Vocalization for \`registerUser\` Method:**
+    "Now, let's implement the \`registerUser\` method. This method will handle creating new user accounts. It needs to take user details like ID, username, email, and a password hash. Before adding the user, I'll perform a quick check to ensure the user ID isn't already taken, demonstrating **input validation** and **preventing duplicates**."
+    \`\`\`java
         // Registers a new user in the system.
         // Returns true if registration is successful, false otherwise (e.g., username taken).
         public boolean registerUser(String userId, String username, String email, String passwordHash) {
@@ -679,7 +697,11 @@ START IMMEDIATELY WITH THE SOLUTION FLOW AS DESCRIBED BELOW – ZERO INTRODUCTOR
             // Return true indicating successful registration.
             return true;
         }
+    \`\`\`
 
+    **Vocalization for \`loginUser\` Method:**
+    "Next, the \`loginUser\` method will authenticate users. It takes a username and password. I'll retrieve the user from the store and perform a password check. For this example, I'm using a simple string comparison for the password, but in a production system, this would involve secure hashing and salting."
+    \`\`\`java
         // Authenticates a user based on their username and password.
         // Returns the User object if authenticated, null otherwise.
         public User loginUser(String username, String password) {
@@ -697,7 +719,11 @@ START IMMEDIATELY WITH THE SOLUTION FLOW AS DESCRIBED BELOW – ZERO INTRODUCTOR
             // Return null if authentication fails.
             return null;
         }
+    \`\`\`
 
+    **Vocalization for \`postQuestion\` Method:**
+    "The \`postQuestion\` method allows a user to submit a new question. It will take the author, title, and body. I'll generate a unique ID for the question and then create and store the \`Question\` object. This highlights the interaction between the service and the \`Question\` entity."
+    \`\`\`java
         // Allows a user to post a new question.
         // Returns the created Question object.
         public Question postQuestion(User author, String title, String body) {
@@ -712,7 +738,11 @@ START IMMEDIATELY WITH THE SOLUTION FLOW AS DESCRIBED BELOW – ZERO INTRODUCTOR
             // Return the newly created question.
             return newQuestion;
         }
+    \`\`\`
 
+    **Vocalization for \`postAnswer\` Method:**
+    "For \`postAnswer\`, a user provides an answer to an existing question. I'll need to retrieve the target question first. If the question doesn't exist, I'll throw an \`IllegalArgumentException\` to handle that edge case. Then, a new \`Answer\` object is created and associated with both the author and the question."
+    \`\`\`java
         // Allows a user to post an answer to a specific question.
         // Returns the created Answer object.
         public Answer postAnswer(User author, String questionId, String body) {
@@ -736,21 +766,24 @@ START IMMEDIATELY WITH THE SOLUTION FLOW AS DESCRIBED BELOW – ZERO INTRODUCTOR
             // Return the newly created answer.
             return newAnswer;
         }
+    \`\`\`
 
+    **Vocalization for \`upvoteContent\` Method:**
+    "Finally, the \`upvoteContent\` method allows users to upvote questions or answers. It takes the user performing the upvote and the ID of the content. I'll retrieve the content from the store and then delegate the \`upvote\` operation to the \`Votable\` interface implemented by \`Question\` and \`Answer\` classes. A real-world system would also check if a user can upvote their own content, or if they've already voted, which I'd handle with custom exceptions or business logic."
+    \`\`\`java
         // Allows a user to upvote any votable content (Question or Answer).
         public void upvoteContent(User user, String contentId) {
             // Retrieve the content (could be a question or an answer).
-            // A more robust implementation would distinguish content types.
+            // A more robust implementation would distinguish content types or have dedicated services.
             Votable content = questionStore.getVotableContent(contentId);
 
-            // Ensure content exists and user is not trying to upvote their own content.
+            // Ensure content exists and user is not trying to upvote their own content (conceptual check).
             if (content == null) {
                 // Throw an exception if content is not found.
                 throw new IllegalArgumentException("Content with ID " + contentId + " not found.");
             }
-            // Assuming Votable has an author check or a way to get author ID.
-            // This is a simplified check; real implementation needs more context.
-            // if (content.getAuthor().getUserId().equals(user.getUserId())) {
+            // For a real system, you'd add logic to prevent self-upvotes:
+            // if (content instanceof Content && ((Content)content).getAuthor().getUserId().equals(user.getUserId())) {
             //    throw new SelfInteractionNotAllowedException("Cannot upvote your own content.");
             // }
 
@@ -760,9 +793,13 @@ START IMMEDIATELY WITH THE SOLUTION FLOW AS DESCRIBED BELOW – ZERO INTRODUCTOR
             System.out.println(user.getUsername() + " upvoted content: " + contentId);
         }
     }
+    \`\`\`
 
-    // --- Supporting Classes ---
+    ---
 
+    **Vocalization for \`User\` Class:**
+    "Now that the main \`StackOverflowService\` is sketched out, let's define our core entity classes. I'll start with the \`User\` class. It's a simple Plain Old Java Object (POJO) representing a user profile. I'll ensure \`userId\` and \`registrationDate\` are \`final\` as they shouldn't change after creation, promoting immutability where appropriate."
+    \`\`\`java
     // This class represents a User in our system, encapsulating user-related data and actions.
     public class User {
         // userId uniquely identifies the user and should be immutable.
@@ -772,11 +809,13 @@ START IMMEDIATELY WITH THE SOLUTION FLOW AS DESCRIBED BELOW – ZERO INTRODUCTOR
         // email is the user's contact email, for notifications or account recovery.
         private String email;
         // passwordHash stores a hashed version of the password for security.
+        // In a real system, this would be a securely hashed value.
         private String passwordHash;
-        // registrationDate records when the user account was created.
+        // registrationDate records when the user account was created. It's final as it's set once.
         private final Date registrationDate;
 
         // Constructor for creating a new User object.
+        // It initializes all necessary attributes upon object creation.
         public User(String userId, String username, String email, String passwordHash) {
             // Initialize the unique user ID provided during creation.
             this.userId = userId;
@@ -786,11 +825,12 @@ START IMMEDIATELY WITH THE SOLUTION FLOW AS DESCRIBED BELOW – ZERO INTRODUCTOR
             this.email = email;
             // Store the provided hashed password.
             this.passwordHash = passwordHash;
-            // Set the registration date to the current time.
+            // Set the registration date to the current time, using java.util.Date.
             this.registrationDate = new Date();
         }
 
         // Method to check if the provided password matches the stored hash.
+        // IMPORTANT: For production, use secure hashing algorithms (e.g., BCrypt).
         public boolean checkPassword(String password) {
             // In a real application, this would involve hashing the provided password
             // and comparing it with this.passwordHash using a secure hashing algorithm.
@@ -822,8 +862,13 @@ START IMMEDIATELY WITH THE SOLUTION FLOW AS DESCRIBED BELOW – ZERO INTRODUCTOR
             return email;
         }
     }
+    \`\`\`
 
+    **Vocalization for \`Votable\` Interface:**
+    "To enable voting on different types of content, like questions and answers, I'll introduce an interface called \`Votable\`. This interface defines the contract for any object that can be upvoted or downvoted, promoting **polymorphism** and **loose coupling**."
+    \`\`\`java
     // This interface defines the contract for any object that can be voted on.
+    // It promotes polymorphism, allowing generic handling of votable items.
     interface Votable {
         // Method to increment the upvote count.
         void upvote();
@@ -836,33 +881,38 @@ START IMMEDIATELY WITH THE SOLUTION FLOW AS DESCRIBED BELOW – ZERO INTRODUCTOR
         // Method to get a unique identifier for the votable item.
         String getId();
     }
+    \`\`\`
 
+    **Vocalization for \`Content\` Abstract Class:**
+    "Since both \`Question\` and \`Answer\` share common attributes like ID, body, author, and votes, I'll create an \`abstract\` class called \`Content\`. This class will implement the \`Votable\` interface and hold these common fields and voting logic, avoiding code duplication and adhering to the **Don't Repeat Yourself (DRY)** principle. It's abstract because a generic 'Content' object doesn't exist on its own; it must be a specific type like a Question or Answer."
+    \`\`\`java
     // This abstract class provides common attributes and methods for content.
+    // It implements the Votable interface and serves as a base for Question and Answer.
     abstract class Content implements Votable {
         // Unique ID for the content item.
         protected String id;
-        // The body of the content.
+        // The body of the content, which is the main text.
         protected String body;
         // The user who authored the content.
         protected User author;
         // Date when the content was created.
         protected Date creationDate;
-        // Count of upvotes received.
+        // Count of upvotes received for this content.
         protected int upvotes;
-        // Count of downvotes received.
+        // Count of downvotes received for this content.
         protected int downvotes;
 
         // Constructor to initialize common content properties.
         public Content(String id, String body, User author) {
-            // Set the unique ID.
+            // Set the unique ID for the content.
             this.id = id;
-            // Set the main text body.
+            // Set the main text body of the content.
             this.body = body;
             // Set the author of the content.
             this.author = author;
-            // Set the creation date to the current time.
+            // Set the creation date to the current timestamp.
             this.creationDate = new Date();
-            // Initialize vote counts to zero.
+            // Initialize vote counts to zero when content is created.
             this.upvotes = 0;
             this.downvotes = 0;
         }
@@ -908,19 +958,28 @@ START IMMEDIATELY WITH THE SOLUTION FLOW AS DESCRIBED BELOW – ZERO INTRODUCTOR
             return author;
         }
     }
+    \`\`\`
 
+    **Vocalization for \`Question\` Class:**
+    "Now for the \`Question\` class. This class extends \`Content\`, inheriting its common properties. It will have specific attributes like \`title\`, and lists for \`answers\` and \`comments\`. It also needs a method to \`acceptAnswer\`, which is unique to questions. This demonstrates **inheritance** and specializing behavior."
+    \`\`\`java
     // Example of a concrete class extending Content.
+    // This class represents a question posted by a user.
     class Question extends Content {
-        // Title of the question.
+        // Title of the question, providing a summary.
         private String title;
         // List of answers associated with this question.
+        // Uses ArrayList for dynamic size, demonstrating composition.
         private List<Answer> answers;
         // List of comments associated with this question.
+        // Uses ArrayList for dynamic size, demonstrating composition.
         private List<Comment> comments;
         // Reference to the answer that has been accepted for this question.
+        // Null if no answer has been accepted yet.
         private Answer acceptedAnswer;
 
         // Constructor for Question.
+        // Initializes specific question properties and calls the superclass constructor.
         public Question(String id, String title, String body, User author) {
             // Call the superclass constructor to initialize common content properties.
             super(id, body, author);
@@ -929,19 +988,19 @@ START IMMEDIATELY WITH THE SOLUTION FLOW AS DESCRIBED BELOW – ZERO INTRODUCTOR
             // Initialize empty lists for answers and comments.
             this.answers = new ArrayList<>();
             this.comments = new ArrayList<>();
-            // Initially, no answer is accepted.
+            // Initially, no answer is accepted for a new question.
             this.acceptedAnswer = null;
         }
 
         // Method to add an answer to this question.
         public void addAnswer(Answer answer) {
-            // Add the provided answer to the list of answers.
+            // Add the provided answer to the list of answers for this question.
             this.answers.add(answer);
         }
 
         // Method to add a comment to this question.
         public void addComment(Comment comment) {
-            // Add the provided comment to the list of comments.
+            // Add the provided comment to the list of comments for this question.
             this.comments.add(comment);
         }
 
@@ -949,15 +1008,16 @@ START IMMEDIATELY WITH THE SOLUTION FLOW AS DESCRIBED BELOW – ZERO INTRODUCTOR
         // Sets the acceptedAnswer and marks the answer itself as accepted.
         public void acceptAnswer(Answer answer) {
             // Ensure the provided answer is actually part of this question's answers.
+            // This is an important validation step to prevent accepting unrelated answers.
             if (this.answers.contains(answer)) {
                 // Set this question's accepted answer.
                 this.acceptedAnswer = answer;
-                // Mark the answer itself as accepted.
+                // Mark the answer itself as accepted through its own method.
                 answer.markAsAccepted();
-                // Log the action.
+                // Log the action for tracking.
                 System.out.println("Answer " + answer.getId() + " accepted for question " + this.getId());
             } else {
-                // Throw an exception if the answer doesn't belong to this question.
+                // Throw an exception if the answer doesn't belong to this question, indicating an invalid operation.
                 throw new IllegalArgumentException("Answer does not belong to this question.");
             }
         }
@@ -982,29 +1042,37 @@ START IMMEDIATELY WITH THE SOLUTION FLOW AS DESCRIBED BELOW – ZERO INTRODUCTOR
 
         // Checks if an answer has been accepted for this question.
         public boolean isAnswerAccepted() {
-            // Returns true if an accepted answer exists.
+            // Returns true if an accepted answer (not null) exists.
             return acceptedAnswer != null;
         }
     }
+    \`\`\`
 
+    **Vocalization for \`Answer\` Class:**
+    "The \`Answer\` class also extends \`Content\`, inheriting basic content properties. Its key specific attribute is a reference to its \`parentQuestion\` and a flag indicating if it's \`isAccepted\`. It will also have a \`markAsAccepted\` method. This further demonstrates how concrete types specialize from the abstract \`Content\`."
+    \`\`\`java
     // Example of another concrete class extending Content (simplified).
+    // This class represents an answer to a question.
     class Answer extends Content {
         // The question this answer belongs to.
+        // This establishes a clear association back to its parent question.
         private Question parentQuestion;
-        // Flag to indicate if this answer has been accepted.
+        // Flag to indicate if this answer has been accepted by the question's author.
         private boolean isAccepted;
 
         // Constructor for Answer.
+        // Initializes answer-specific properties and calls the superclass constructor.
         public Answer(String id, String body, User author, Question parentQuestion) {
-            // Call superclass constructor.
+            // Call superclass constructor to initialize common content properties.
             super(id, body, author);
-            // Set the parent question.
+            // Set the parent question for this answer.
             this.parentQuestion = parentQuestion;
-            // Initialize as not accepted.
+            // Initialize as not accepted by default.
             this.isAccepted = false;
         }
 
         // Method to mark this answer as accepted.
+        // This state change is typically triggered by the Question accepting this answer.
         public void markAsAccepted() {
             // Set the acceptance flag to true.
             this.isAccepted = true;
@@ -1016,8 +1084,13 @@ START IMMEDIATELY WITH THE SOLUTION FLOW AS DESCRIBED BELOW – ZERO INTRODUCTOR
             return isAccepted;
         }
     }
+    \`\`\`
 
+    **Vocalization for \`UserStore\` Class:**
+    "Next, let's look at the \`UserStore\` class. This class is an example of a **repository pattern** or a **data access object (DAO)**. It's solely responsible for managing user data, like adding, retrieving, and storing users. I'll use \`HashMaps\` internally for efficient lookups by \`userId\` and \`username\`."
+    \`\`\`java
     // This class simulates a data store for User objects.
+    // It acts as a repository for user-related data, adhering to separation of concerns.
     class UserStore {
         // Stores users, mapped by their userId for quick lookup.
         private Map<String, User> usersById;
@@ -1055,22 +1128,29 @@ START IMMEDIATELY WITH THE SOLUTION FLOW AS DESCRIBED BELOW – ZERO INTRODUCTOR
         // Gets all registered users.
         public List<User> getAllUsers() {
             // Returns a new ArrayList containing all users from the ID map's values.
+            // This prevents external modification of the internal map.
             return new ArrayList<>(usersById.values());
         }
     }
+    \`\`\`
 
+    **Vocalization for \`QuestionStore\` Class:**
+    "Similarly, the \`QuestionStore\` will manage our questions and answers. It will provide methods to add, retrieve, and update questions and their associated answers. Like \`UserStore\`, it encapsulates the data persistence logic for questions."
+    \`\`\`java
     // This class simulates a data store for Question and Answer objects.
+    // It manages the persistence and retrieval of questions and answers.
     class QuestionStore {
         // Stores questions, mapped by their questionId.
         private Map<String, Question> questions;
         // Potentially a separate map for answers if they need independent lookup.
+        // In a real system, answers are strongly tied to questions; this is a simplified view.
         private Map<String, Answer> answers; // Simplified, in reality answers are tied to questions.
 
         // Constructor to initialize the question and answer stores.
         public QuestionStore() {
-            // Initialize the map to store questions.
+            // Initialize the map to store questions by their ID.
             this.questions = new HashMap<>();
-            // Initialize the map to store answers.
+            // Initialize the map to store answers by their ID.
             this.answers = new HashMap<>();
         }
 
@@ -1105,27 +1185,32 @@ START IMMEDIATELY WITH THE SOLUTION FLOW AS DESCRIBED BELOW – ZERO INTRODUCTOR
         }
 
         // A simplified method to get votable content (Question or Answer) by ID.
-        // In a real system, this might involve more sophisticated logic or separate services.
+        // In a real system, this might involve more sophisticated logic or separate services
+        // to distinguish content types.
         public Votable getVotableContent(String contentId) {
             // First, try to get it as a question.
             if (questions.containsKey(contentId)) {
                 return questions.get(contentId);
             }
-            // If not a question, try to get it as an answer.
+            // If not found as a question, try to get it as an answer.
             if (answers.containsKey(contentId)) {
                 return answers.get(contentId);
             }
-            // Return null if content is not found.
+            // Return null if content is not found in either store.
             return null;
         }
     }
+    \`\`\`
 
+    **Vocalization for Imports/Utilities:**
+    "Finally, these are the standard Java utility classes I'd include for data structures like lists and maps, and for handling dates."
+    \`\`\`java
     // Standard Java utility classes often used in LLD.
-    import java.util.ArrayList; // Used for dynamic lists.
-    import java.util.Date;      // Used for timestamps like creationDate.
-    import java.util.HashMap;   // Used for hash maps (e.g., in stores).
-    import java.util.List;      // Interface for list collections.
-    import java.util.Map;       // Interface for map collections.
+    import java.util.ArrayList; // Used for dynamic lists (e.g., for answers, comments).
+    import java.util.Date;      // Used for timestamps like creationDate, registrationDate.
+    import java.util.HashMap;   // Used for hash maps (e.g., in UserStore, QuestionStore for efficient lookups).
+    import java.util.List;      // Interface for list collections (best practice to program to interfaces).
+    import java.util.Map;       // Interface for map collections (best practice to program to interfaces).
     \`\`\`
 
 ---
@@ -1164,7 +1249,8 @@ START IMMEDIATELY WITH THE SOLUTION FLOW AS DESCRIBED BELOW – ZERO INTRODUCTOR
         * \`loginUser\` retrieves the \`User\` from \`UserStore\` and authenticates.
         * \`postQuestion\` creates a \`Question\` object, associates it with the author, and adds it to \`QuestionStore\`.
         * \`postAnswer\` retrieves the \`Question\`, creates an \`Answer\` object linked to the question and author, then adds the answer to the \`Question\` object itself and updates the \`QuestionStore\`.
-        * Finally, \`q1.acceptAnswer(a1)\` updates the state within the \`Question\` object to mark the answer as accepted, and also tells the \`Answer\` object \`a1\` to mark itself as accepted."
+        * Finally, \`q1.acceptAnswer(a1)\` updates the state within the \`Question\` object to mark the answer as accepted, and also tells the \`Answer\` object \`a1\` to mark itself as accepted.
+    * This sequence demonstrates the clear responsibilities of each class and how they collaborate to fulfill a core use case."
 * **Scenario 2 (Edge Case: User tries to upvote their own content):**
     * **Input/Actions:**
         * \\\`StackOverflowService service = new StackOverflowService();\\\`
@@ -1174,7 +1260,7 @@ START IMMEDIATELY WITH THE SOLUTION FLOW AS DESCRIBED BELOW – ZERO INTRODUCTOR
         * \\\`service.upvoteContent(alice, q1.getId());\\\` (This action assumes a check for self-upvoting exists in \`upvoteContent\` or a called method)
     * **Expected Outcome:**
         * "This action should result in an error or specific exception (e.g., \\\`SelfInteractionNotAllowedException\\\`), and the upvote count for \\\`q1\\\` should remain \\\`0\\\`."
-    * **Walkthrough:** "If our \`upvoteContent\` method or a lower-level validation inside the \`Content\` class includes an author check, it would compare the provided \`User\` with the \`Content\`'s author. If they are the same, the method would prevent the upvote and throw the appropriate exception, ensuring business logic rules are enforced."
+    * **Walkthrough:** "If our \`upvoteContent\` method or a lower-level validation inside the \`Content\` class includes an author check, it would compare the provided \`User\` with the \`Content\`'s author. If they match, the method would prevent the upvote and throw the appropriate exception, maintaining system integrity."
 * **Candidate instruction:** "Select one or two key test cases (a core flow and an important edge case). Clearly state the input actions and expected outcomes. Then, walk through the execution flow, explaining how your classes interact to achieve the result or handle the edge case."
 
 </technical_problems>

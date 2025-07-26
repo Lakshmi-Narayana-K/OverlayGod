@@ -4,7 +4,7 @@ import { createAppWindow } from './app'
 import { registerIpcHandlers } from './ipc/router'
 import { UIState, appState } from '../state/AppStateMachine'
 import { GeminiHelper } from '../llm/GeminiHelper'
-// import { GroqHelper } from '../llm/GroqHelper'
+import { GroqHelper } from '../llm/GroqHelper'
 import { LiveAudioService } from '../features/live-audio/LiveAudioService'
 import { ShortcutsHelper } from './shortcuts'
 import { windowRegistry } from './windowRegistry'
@@ -41,7 +41,7 @@ export class ClonelyApp {
   private liveAudioService: LiveAudioService
   private shortcutsHelper!: ShortcutsHelper
   private geminiHelper: GeminiHelper
-  // private groqHelper: GroqHelper
+  private groqHelper: GroqHelper
 
   // =========================================================================================
   // Lifecycle
@@ -54,7 +54,7 @@ export class ClonelyApp {
     this.t0 = t0;
     this.liveAudioService = new LiveAudioService()
     this.geminiHelper = new GeminiHelper()
-    // this.groqHelper = new GroqHelper()
+    this.groqHelper = new GroqHelper()
     this._attachAppEvents()
     app.disableHardwareAcceleration()
   }
@@ -118,7 +118,7 @@ export class ClonelyApp {
     registerIpcHandlers({
       liveAudioService: this.liveAudioService,
       shortcutsHelper: this.shortcutsHelper,
-      // groqHelper: this.groqHelper, // Pass the singleton instance
+      groqHelper: this.groqHelper, // Pass the singleton instance
       createAppWindow: (isInvisible: boolean) => createAppWindow(isInvisible, this.t0),
       getMainWindow: () => this.mainWindow,
       setMainWindow: (win: BrowserWindow) => {
