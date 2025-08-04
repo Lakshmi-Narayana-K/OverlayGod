@@ -101,6 +101,24 @@ export function useMoveable() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [moveLeft, moveRight, resetPosition]);
 
+  // Listen for global shortcuts from main process
+  useEffect(() => {
+    const handleGlobalShortcut = (event: CustomEvent) => {
+      switch (event.detail) {
+        case 'ctrl-left':
+          moveLeft();
+          break;
+        case 'ctrl-right':
+          moveRight();
+          break;
+      }
+    };
+
+    // Listen for custom events dispatched by the preload script
+    window.addEventListener('global-shortcut', handleGlobalShortcut as EventListener);
+    return () => window.removeEventListener('global-shortcut', handleGlobalShortcut as EventListener);
+  }, [moveLeft, moveRight]);
+
   // Prevent wheel events from affecting the moveable container when scrolling in chat
   useEffect(() => {
     const handleWheel = (event: WheelEvent) => {

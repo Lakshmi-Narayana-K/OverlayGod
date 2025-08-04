@@ -27,9 +27,23 @@ export class ShortcutsHelper {
         // Unregister other shortcuts
         this.unregisterWindowShortcuts();
       } else {
-        this.mainWindow.show();
+        // Use showInactive() instead of show() to prevent stealing focus
+        this.mainWindow.showInactive();
         // Register other shortcuts
         this.registerWindowShortcuts();
+      }
+    });
+
+    // Ctrl+Left and Ctrl+Right always listen globally for UI movement
+    globalShortcut.register('CommandOrControl+Left', () => {
+      if (this.mainWindow && !this.mainWindow.isDestroyed() && this.mainWindow.isVisible()) {
+        this.mainWindow.webContents.send('shortcut:ctrl-left');
+      }
+    });
+
+    globalShortcut.register('CommandOrControl+Right', () => {
+      if (this.mainWindow && !this.mainWindow.isDestroyed() && this.mainWindow.isVisible()) {
+        this.mainWindow.webContents.send('shortcut:ctrl-right');
       }
     });
 

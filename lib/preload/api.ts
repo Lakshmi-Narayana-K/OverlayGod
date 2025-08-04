@@ -18,4 +18,13 @@ const api = {
   },
 }
 
+// Set up listeners for global shortcuts
+ipcRenderer.on('shortcut:ctrl-left', () => {
+  window.dispatchEvent(new CustomEvent('global-shortcut', { detail: 'ctrl-left' }));
+});
+
+ipcRenderer.on('shortcut:ctrl-right', () => {
+  window.dispatchEvent(new CustomEvent('global-shortcut', { detail: 'ctrl-right' }));
+});
+
 export default api
